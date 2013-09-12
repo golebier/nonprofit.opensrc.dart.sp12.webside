@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# SyncOut All chnged files
+
+# TODO spwebside.dart as param
+case "$(svn -q st|awk '{ print $2 }'|grep spwebside.dart|wc -w)" in
+1*)
+   rm spwebside.dart.*
+   dart2js --verbose --disallow-unsafe-eval --out=spwebside.dart.js spwebside.dart
+   svn ci -m "AutoSyncOut: " spwebside.dart
+   ;;
+0*)
+   echo "Did not commit: spwebside.dart "
+   ;;
+*)
+   echo "Err"; echo "Err"; echo "Err"; echo "Err";
+   ;;
+esac
+
+# Sync All chnged files
+ 
+All=$(svn -q st|awk '{ print $2}')
+for p in $All
+do
+   Params=$(echo "$p"|sed -e 's/\// /g')
+   ParamsCount=$(echo "$Params"|wc -w)
+
+   case "$ParamsCount" in
+   1*)
+      echo "bash FtpCommit.Bsh . $Params"
+      bash FtpCommit.Bsh . $Params
+      ;;
+   2*)
+      echo "bash FtpCommit.Bsh $Params"
+      bash FtpCommit.Bsh $Params
+      ;;
+   *)
+      echo "Err"; echo "Err"; echo "Err"; echo "Err";
+      ;;
+   esac
+done
+
+echo "svn ci -m \"Auto sync:\" $All"
+svn ci -m "Auto sync:" $All

@@ -1,0 +1,28 @@
+#!/bin/bash
+
+E_ARGERROR=85
+
+if [ -z "$1" ]
+then
+  echo "Usage: `basename $0` Filename-to-upload"
+  exit $E_ARGERROR
+fi
+
+Server="???????"
+Directory="???????/$1/"
+User="???????"
+Password="???????"
+
+Pwd=$(pwd)
+cd $1
+
+ftp -n $Server <<End-Of-Session
+user $User $Password
+cd $Directory
+ls $2
+put $2
+ls $2
+bye
+End-Of-Session
+
+cd $Pwd
